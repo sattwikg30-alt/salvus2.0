@@ -133,16 +133,11 @@ const VendorDashboard = () => {
                         <TransactionHistory transactions={transactions} />
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="lg:col-span-1"
-                    >
+                    <div className="lg:col-span-1">
                         <div className="sticky top-8">
                             {vendor && <VendorProfile vendor={vendor} />}
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </div>

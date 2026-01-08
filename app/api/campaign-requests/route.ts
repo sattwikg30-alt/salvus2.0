@@ -56,16 +56,17 @@ export async function POST(req: Request) {
     }
 
     const form = await req.formData()
+    const formData = form as any;
 
-    const organizationName = String(form.get('organizationName') || '')
-    const organizationType = String(form.get('organizationType') || '')
-    const contactPerson = String(form.get('contactPerson') || '')
-    const officialEmail = String(form.get('officialEmail') || '')
-    const phone = String(form.get('phone') || '')
-    const website = String(form.get('website') || '')
-    const regNumber = String(form.get('regNumber') || '')
-    const headOfficeLocation = String(form.get('headOfficeLocation') || '')
-    const reason = String(form.get('reason') || '')
+    const organizationName = String(formData.get('organizationName') || '')
+    const organizationType = String(formData.get('organizationType') || '')
+    const contactPerson = String(formData.get('contactPerson') || '')
+    const officialEmail = String(formData.get('officialEmail') || '')
+    const phone = String(formData.get('phone') || '')
+    const website = String(formData.get('website') || '')
+    const regNumber = String(formData.get('regNumber') || '')
+    const headOfficeLocation = String(formData.get('headOfficeLocation') || '')
+    const reason = String(formData.get('reason') || '')
 
     if (!organizationName || !organizationType || !contactPerson || !officialEmail || !phone || !headOfficeLocation || !reason) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 })
