@@ -61,7 +61,7 @@ export default function DonorDashboard() {
           {/* Right Actions */}
           <div className="flex items-center gap-4">
             {/* Wallet Connect */}
-            <WalletConnect />
+            <WalletConnect apiEndpoint="/api/link-wallet" />
 
             {/* Notifications */}
             <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group">

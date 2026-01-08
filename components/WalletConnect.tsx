@@ -4,14 +4,18 @@ import { useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
-export default function WalletConnect() {
+interface WalletConnectProps {
+  apiEndpoint?: string;
+}
+
+export default function WalletConnect({ apiEndpoint = '/api/link-wallet' }: WalletConnectProps) {
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
     const linkWallet = async () => {
       if (isConnected && address) {
         try {
-          await fetch('/api/link-wallet', {
+          await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -25,7 +29,7 @@ export default function WalletConnect() {
     };
 
     linkWallet();
-  }, [address, isConnected]);
+  }, [address, isConnected, apiEndpoint]);
 
   return (
     <div className="wallet-connect-wrapper">

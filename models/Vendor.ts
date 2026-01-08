@@ -77,6 +77,10 @@ const VendorSchema = new mongoose.Schema({
     enum: ['Pending', 'Verified', 'Flagged', 'Approved', 'Suspended'],
     default: 'Pending'
   },
+  walletAddress: {
+    type: String,
+    lowercase: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -8,6 +8,11 @@ import EnhancedStatCard from '../admin/EnhancedStatCard';
 import { motion } from 'framer-motion';
 import { Package, CheckCircle2, DollarSign, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const WalletConnect = dynamic(() => import('@/components/WalletConnect'), {
+    ssr: false,
+});
 
 const VendorDashboard = () => {
     const [vendor, setVendor] = useState<any | null>(null)
@@ -50,6 +55,7 @@ const VendorDashboard = () => {
                             </h1>
                         </Link>
                         <div className="flex items-center gap-3">
+                            <WalletConnect apiEndpoint="/api/vendor/link-wallet" />
                             {vendor && (
                                 <span className="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-mono text-gray-400">
                                     ID: <span className="text-gray-300">{vendor.id}</span>
