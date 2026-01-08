@@ -1,0 +1,146 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import VendorProfile from './VendorProfile';
+import InventoryManagement from './InventoryManagement';
+import TransactionHistory from './TransactionHistory';
+import EnhancedStatCard from '../admin/EnhancedStatCard';
+import { motion } from 'framer-motion';
+import { Package, CheckCircle2, DollarSign, LogOut } from 'lucide-react';
+import Link from 'next/link';
+
+const VendorDashboard = () => {
+    const [vendor, setVendor] = useState<any | null>(null)
+    const [stats, setStats] = useState<{ itemsListed: number; totalOrders: number; paymentsReceived: number }>({ itemsListed: 0, totalOrders: 0, paymentsReceived: 0 })
+    const [transactions, setTransactions] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        let mounted = true
+        const load = async () => {
+            try {
+                const res = await fetch('/api/vendor-dashboard')
+                if (!res.ok) throw new Error('Failed to load vendor dashboard')
+                const data = await res.json()
+                if (!mounted) return
+                setVendor(data.vendor)
+                setStats(data.stats)
+                setTransactions(data.transactions)
+            } catch (e) {
+                console.error(e)
+            } finally {
+                setLoading(false)
+            }
+        }
+        load()
+        return () => { mounted = false }
+    }, [])
+
+    return (
+        <div className="min-h-screen bg-dark-darker text-gray-200 p-4 md:p-8 relative overflow-hidden">
+            <div className="fixed top-0 left-0 w-full h-[500px] bg-accent/5 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none z-0"></div>
+            <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[100px] translate-y-1/3 pointer-events-none z-0"></div>
+
+            <div className="max-w-[1400px] mx-auto relative z-10">
+                <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 glass-nav border-b border-white/5">
+                    <div className="flex items-center justify-between">
+                        <Link href="/" className="inline-flex items-center gap-2 group">
+                            <h1 className="text-2xl font-black tracking-tighter text-white group-hover:scale-[1.02] transition-transform">
+                                SALVUS<span className="text-accent">.</span>
+                            </h1>
+                        </Link>
+                        <div className="flex items-center gap-3">
+                            {vendor && (
+                                <span className="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-mono text-gray-400">
+                                    ID: <span className="text-gray-300">{vendor.id}</span>
+                                </span>
+                            )}
+                            <Link href="/" className="p-2 rounded-full text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all">
+                                <LogOut className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    </div>
+                </nav>
+
+                <div className="pt-24"></div>
+
+                <div className="mb-10">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-4xl md:text-5xl font-black text-white tracking-tight"
+                    >
+                        Vendor Dashboard
+                    </motion.h1>
+                    <p className="text-gray-400 mt-2">Manage your store, transactions, and orders in one place</p>
+                    {vendor && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="mt-3 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-mono text-gray-400 inline-block"
+                        >
+                            ID: <span className="text-gray-300">{vendor.id}</span>
+                        </motion.div>
+                    )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <EnhancedStatCard
+                        icon={Package}
+                        label="Items Listed"
+                        value={String(stats.itemsListed)}
+                        color="text-blue-400"
+                        bgColor="bg-blue-400/10"
+                        borderColor="border-blue-400/20"
+                        delay={0.1}
+                    />
+                    <EnhancedStatCard
+                        icon={CheckCircle2}
+                        label="Total Orders"
+                        value={String(stats.totalOrders)}
+                        color="text-emerald-400"
+                        bgColor="bg-emerald-400/10"
+                        borderColor="border-emerald-400/20"
+                        delay={0.2}
+                    />
+                    <EnhancedStatCard
+                        icon={DollarSign}
+                        label="Payments Received"
+                        value={`₹${(stats.paymentsReceived || 0).toLocaleString()}`}
+                        color="text-purple-400"
+                        bgColor="bg-purple-400/10"
+                        borderColor="border-purple-400/20"
+                        delay={0.3}
+                    />
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-8">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="lg:col-span-2 space-y-8"
+                    >
+                        <InventoryManagement allowedCategories={vendor?.allowedCategories || []} />
+                        <TransactionHistory transactions={transactions} />
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="lg:col-span-1"
+                    >
+                        <div className="sticky top-8">
+                            {vendor && <VendorProfile vendor={vendor} />}
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default VendorDashboard;
