@@ -9,6 +9,11 @@ import DonateSection from '@/components/dashboard/DonateSection'
 import DonationHistory from '@/components/dashboard/DonationHistory'
 import ImpactBreakdown from '@/components/dashboard/ImpactBreakdown'
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+
+const WalletConnect = dynamic(() => import('@/components/WalletConnect'), {
+  ssr: false,
+})
 
 export default function DonorDashboard() {
   const [userName, setUserName] = useState('')
@@ -55,6 +60,9 @@ export default function DonorDashboard() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
+            {/* Wallet Connect */}
+            <WalletConnect />
+
             {/* Notifications */}
             <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group">
               <Bell className="w-5 h-5" />

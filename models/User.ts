@@ -47,6 +47,10 @@ const UserSchema = new mongoose.Schema({
     enum: ['Donor', 'Beneficiary', 'Admin', 'Vendor'],
     default: 'Donor',
   },
+  walletAddress: {
+    type: String,
+    lowercase: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
