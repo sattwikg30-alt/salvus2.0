@@ -11,15 +11,19 @@ import { useEffect, useState } from 'react'
 
 export default function BeneficiaryDashboard() {
   const [category, setCategory] = useState('Food')
-  const [store, setStore] = useState('')
-  const [amount, setAmount] = useState('')
+  const [store, setStore] = useState('') // Store ID
+  const [storeName, setStoreName] = useState('') // Store Name for display
+  const [amount, setAmount] = useState('0')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
 
   const [categories, setCategories] = useState<string[]>([])
-  const [stores, setStores] = useState<string[]>([])
+  const [allStores, setAllStores] = useState<{ id: string; name: string; authorizedCategories: string[] }[]>([])
+  const [inventory, setInventory] = useState<{ _id: string; name: string; price: number; unit: string; category: string }[]>([])
+  const [cart, setCart] = useState<{ [key: string]: number }>({}) // itemId -> quantity
+
   const [balances, setBalances] = useState<{ label: string; remaining: number; limit: number }[]>([])
   const [history, setHistory] = useState<{ store: string; category: string; amount: number; date: string; status: string }[]>([])
 
@@ -58,7 +62,7 @@ export default function BeneficiaryDashboard() {
           setApprovalDate(d.toLocaleDateString('en-US', options))
         }
         setCategories(data.categories || [])
-        setStores(data.stores || [])
+        setAllStores(data.stores || [])
         setBalances(data.balances || [])
         setHistory(data.history || [])
         setTotalLimit(data.totalLimit || 0)
@@ -78,6 +82,54 @@ export default function BeneficiaryDashboard() {
   const categoryIconMap: Record<string, any> = { Food: Soup, Medicine: HeartPulse, Transport: BusFront, Shelter: Home }
   const totalRemaining = balances.reduce((sum, b) => sum + b.remaining, 0)
   const totalPercentRemaining = Math.min(100, Math.round((totalRemaining / totalLimit) * 100))
+
+  const filteredStores = allStores.filter(s => s.authorizedCategories?.includes(category))
+
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory)
+    setCategoryOpen(false)
+    setStore('')
+    setStoreName('')
+    setInventory([])
+    setCart({})
+    setAmount('0')
+  }
+
+  const handleStoreChange = async (storeId: string, name: string) => {
+    setStore(storeId)
+    setStoreName(name)
+    setStoreOpen(false)
+    setInventory([])
+    setCart({})
+    setAmount('0')
+    
+    try {
+      const res = await fetch(`/api/inventory?vendorId=${storeId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setInventory(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch inventory', error)
+    }
+  }
+
+  const handleQuantityChange = (itemId: string, price: number, delta: number) => {
+    setCart(prev => {
+      const currentQty = prev[itemId] || 0
+      const newQty = Math.max(0, currentQty + delta)
+      const newCart = { ...prev, [itemId]: newQty }
+      
+      let newTotal = 0
+      inventory.forEach(item => {
+        const qty = newCart[item._id] || 0
+        newTotal += qty * item.price
+      })
+      setAmount(newTotal.toFixed(2))
+      
+      return newCart
+    })
+  }
 
   const submitPurchase = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -335,7 +387,7 @@ export default function BeneficiaryDashboard() {
                         <button
                           key={c}
                           type="button"
-                          onClick={() => { setCategory(c); setCategoryOpen(false); }}
+                          onClick={() => handleCategoryChange(c)}
                           className="w-full flex items-center gap-3 p-4 hover:bg-white/5 text-left transition-colors"
                         >
                           <div className="text-accent">
@@ -358,28 +410,75 @@ export default function BeneficiaryDashboard() {
                   >
                     <div className="flex items-center gap-3">
                       <Store className="w-5 h-5 text-gray-400" />
-                      <span className={store ? "font-semibold" : "text-gray-400"}>{store || "Select Store"}</span>
+                      <span className={store ? "font-semibold" : "text-gray-400"}>{storeName || "Select Store"}</span>
                     </div>
                     <div className="text-gray-400">▼</div>
                   </button>
 
                   {storeOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1d24] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
-                      {stores.map(s => (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1d24] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 max-h-60 overflow-y-auto">
+                      {filteredStores.length > 0 ? filteredStores.map(s => (
                         <button
-                          key={s}
+                          key={s.id}
                           type="button"
-                          onClick={() => { setStore(s); setStoreOpen(false); }}
+                          onClick={() => handleStoreChange(s.id, s.name)}
                           className="w-full flex items-center gap-3 p-4 hover:bg-white/5 text-left transition-colors"
                         >
                           <Store className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-200 font-medium">{s}</span>
+                          <span className="text-gray-200 font-medium">{s.name}</span>
                         </button>
-                      ))}
+                      )) : (
+                        <div className="p-4 text-gray-500 text-sm">No stores found for this category</div>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Inventory Selection */}
+              {store && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Store className="w-5 h-5 text-accent" />
+                    Select Items
+                  </h3>
+                  
+                  {inventory.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                      {inventory.map(item => (
+                        <div key={item._id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                          <div>
+                            <div className="font-medium text-white">{item.name}</div>
+                            <div className="text-sm text-gray-400">₹{item.price} / {item.unit}</div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 bg-black/30 rounded-lg p-1">
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(item._id, item.price, -1)}
+                              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-bold text-white">{cart[item._id] || 0}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(item._id, item.price, 1)}
+                              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/10 text-accent hover:text-accent-light transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center rounded-xl bg-white/5 border border-white/5 border-dashed text-gray-500">
+                      No items available in this store.
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Amount */}
               <div>
@@ -387,19 +486,21 @@ export default function BeneficiaryDashboard() {
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</span>
                   <input
-                    type="number"
+                    type="text"
+                    readOnly
                     value={amount}
-                    onWheel={(e) => (e.target as HTMLInputElement).blur()}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="w-full pl-10 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all placeholder-gray-600"
+                    className="w-full pl-10 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all placeholder-gray-600 cursor-not-allowed opacity-80"
                     placeholder="0.00"
                   />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
+                    Calculated automatically
+                  </div>
                 </div>
               </div>
 
               <motion.button
                 whileTap={{ scale: 0.98 }}
-                disabled={loading || !amount || !store}
+                disabled={loading || parseFloat(amount) <= 0 || !store}
                 type="submit"
                 className="w-full py-4 bg-accent hover:bg-accent-dark text-dark-darker font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >

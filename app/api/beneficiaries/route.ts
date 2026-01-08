@@ -45,7 +45,7 @@ export async function GET() {
       organisationName = org?.name || ''
     }
 
-    const vendors = await Vendor.find({ campaignId: beneficiary.campaignId, status: 'Approved' }).select('name')
+    const vendors = await Vendor.find({ campaignId: beneficiary.campaignId, status: 'Approved' }).select('name authorizedCategories')
 
     const txns = await Transaction.find({ beneficiaryId: beneficiary._id }).sort({ timestamp: -1 }).limit(10).populate('vendorId', 'name')
 
@@ -81,7 +81,11 @@ export async function GET() {
       approvalDate = approvedLog?.timestamp || beneficiary.createdAt
     }
 
-    const stores = vendors.map(v => v.name)
+    const stores = vendors.map(v => ({
+      id: v._id,
+      name: v.name,
+      authorizedCategories: v.authorizedCategories || []
+    }))
 
     const history = txns.map(t => {
       const date = new Date(t.timestamp)
