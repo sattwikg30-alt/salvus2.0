@@ -102,7 +102,7 @@ export default function BeneficiaryDashboard() {
     setInventory([])
     setCart({})
     setAmount('0')
-    
+
     try {
       const res = await fetch(`/api/inventory?vendorId=${storeId}`)
       if (res.ok) {
@@ -119,14 +119,14 @@ export default function BeneficiaryDashboard() {
       const currentQty = prev[itemId] || 0
       const newQty = Math.max(0, currentQty + delta)
       const newCart = { ...prev, [itemId]: newQty }
-      
+
       let newTotal = 0
       inventory.forEach(item => {
         const qty = newCart[item._id] || 0
         newTotal += qty * item.price
       })
       setAmount(newTotal.toFixed(2))
-      
+
       return newCart
     })
   }
@@ -252,95 +252,59 @@ export default function BeneficiaryDashboard() {
         </motion.div>
 
 
-        {/* Allowed Categories */}
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-        >
-            <h3 className="text-lg font-bold text-white mb-4">Allowed Categories</h3>
-            <div className="flex flex-wrap gap-3">
-                {categories.length > 0 ? categories.map(cat => (
-                    <div key={cat} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-300">
-                        {(() => { const Icon = categoryIconMap[cat] || BadgeCheck; return <Icon className="w-4 h-4 text-accent" /> })()}
-                        <span>{cat}</span>
-                    </div>
-                )) : (
-                    <div className="text-gray-500">No specific categories listed.</div>
-                )}
-            </div>
-
-            <div className="mt-6 space-y-2">
-              <div className="text-sm text-gray-300 font-bold">Category Spending Limits</div>
-              <div className="text-xs text-gray-500">(not additive, per category caps)</div>
-              <div className="mt-2 space-y-1 text-sm text-gray-200 font-mono">
-                {balances.length > 0 ? balances.map(b => {
-                  const spent = Math.max(0, (b.limit || 0) - (b.remaining || 0))
-                  return (
-                    <div key={b.label} className="flex justify-between max-w-md">
-                      <span className="text-gray-300">{b.label}</span>
-                      <span>₹{spent.toLocaleString()} / ₹{b.limit.toLocaleString()}</span>
-                    </div>
-                  )
-                }) : <div className="text-gray-500">No category limits defined.</div>}
-              </div>
-              <div className="mt-3 flex items-start gap-2 text-xs text-gray-400">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/10 border border-white/20 text-accent">ℹ️</span>
-                <div>
-                  <div>You cannot exceed ₹{totalLimit.toLocaleString()} in total.</div>
-                  <div>Category limits only restrict spending within each category.</div>
-                </div>
-              </div>
-            </div>
-        </motion.div>
-
-        {/* Balances Grid */}
+        {/* Allowed Categories & Limits */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8"
+          transition={{ duration: 0.6 }}
+          className="mb-8"
         >
-          {balances.map(({ label, remaining, limit }, idx) => (
-            <motion.div
-              key={label}
-              whileHover={{ y: -5 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="relative overflow-hidden glass-card rounded-2xl p-5 md:p-6 group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="glass-card rounded-3xl p-6 md:p-8">
+            <h3 className="text-lg font-bold text-white mb-4">Allowed Categories</h3>
+            <div className="flex flex-wrap gap-3 mb-8">
+              {categories.length > 0 ? categories.map(cat => (
+                <div key={cat} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                  {(() => { const Icon = categoryIconMap[cat] || BadgeCheck; return <Icon className="w-4 h-4 text-accent" /> })()}
+                  <span>{cat}</span>
+                </div>
+              )) : (
+                <div className="text-gray-500">No specific categories listed.</div>
+              )}
+            </div>
 
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  {(() => { const Icon = categoryIconMap[label] || Soup; return (
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-300 text-accent">
-                      <Icon className="w-6 h-6" />
-                    </div>
-                  )})()}
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{label}</span>
+            <div className="space-y-4">
+              <div className="border-t border-white/10 pt-6">
+                <div className="mb-4">
+                  <div className="text-lg font-bold text-white">Category Spending Limits</div>
+                  <div className="text-sm text-gray-400">(not additive, per category caps)</div>
                 </div>
 
-                <div className="mb-3">
-                  <div className="text-2xl font-bold text-white">
-                    ₹{remaining.toLocaleString()}
-                  </div>
-                  <div className="text-sm font-medium text-gray-400 mt-1">
-                    Limit: ₹{limit.toLocaleString()}
-                  </div>
-                </div>
-
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPercent(remaining, limit)}%` }}
-                    transition={{ duration: 0.8, delay: idx * 0.1 }}
-                    className="h-full bg-accent rounded-full shadow-[0_0_8px_rgba(45,212,191,0.5)]"
-                  />
+                <div className="space-y-3">
+                  {balances.length > 0 ? balances.map(b => {
+                    const spent = Math.max(0, (b.limit || 0) - (b.remaining || 0))
+                    return (
+                      <div key={b.label} className="grid grid-cols-2 max-w-sm items-center py-1">
+                        <span className="text-gray-300 font-medium capitalize">{b.label}</span>
+                        <span className="text-right font-mono text-gray-200">
+                          <span className="text-gray-500">₹{spent.toLocaleString()}</span>
+                          <span className="mx-2 text-gray-600">/</span>
+                          <span>₹{b.limit.toLocaleString()}</span>
+                        </span>
+                      </div>
+                    )
+                  }) : <div className="text-gray-500">No category limits defined.</div>}
                 </div>
               </div>
-            </motion.div>
-          ))}
+
+              <div className="mt-8 flex items-start gap-3 p-4 rounded-xl bg-accent/5 border border-accent/10">
+                <span className="text-lg">ℹ️</span>
+                <div className="space-y-1">
+                  <div className="text-gray-200 font-medium">You cannot exceed <span className="text-accent font-bold">₹{totalLimit.toLocaleString()}</span> in total.</div>
+                  <div className="text-sm text-gray-400">Category limits only restrict spending within each category.</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -442,7 +406,7 @@ export default function BeneficiaryDashboard() {
                     <Store className="w-5 h-5 text-accent" />
                     Select Items
                   </h3>
-                  
+
                   {inventory.length > 0 ? (
                     <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                       {inventory.map(item => (
@@ -451,7 +415,7 @@ export default function BeneficiaryDashboard() {
                             <div className="font-medium text-white">{item.name}</div>
                             <div className="text-sm text-gray-400">₹{item.price} / {item.unit}</div>
                           </div>
-                          
+
                           <div className="flex items-center gap-3 bg-black/30 rounded-lg p-1">
                             <button
                               type="button"

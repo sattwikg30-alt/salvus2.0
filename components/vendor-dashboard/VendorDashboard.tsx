@@ -19,20 +19,25 @@ const VendorDashboard = () => {
     const [stats, setStats] = useState<{ itemsListed: number; totalOrders: number; paymentsReceived: number }>({ itemsListed: 0, totalOrders: 0, paymentsReceived: 0 })
     const [transactions, setTransactions] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         let mounted = true
         const load = async () => {
             try {
                 const res = await fetch('/api/vendor-dashboard')
-                if (!res.ok) throw new Error('Failed to load vendor dashboard')
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}))
+                    throw new Error(errData.message || 'Failed to load vendor dashboard')
+                }
                 const data = await res.json()
                 if (!mounted) return
                 setVendor(data.vendor)
                 setStats(data.stats)
                 setTransactions(data.transactions)
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e)
+                setError(e.message || 'Failed to load dashboard data')
             } finally {
                 setLoading(false)
             }
@@ -56,11 +61,6 @@ const VendorDashboard = () => {
                         </Link>
                         <div className="flex items-center gap-3">
                             <WalletConnect apiEndpoint="/api/vendor/link-wallet" />
-                            {vendor && (
-                                <span className="px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-mono text-gray-400">
-                                    ID: <span className="text-gray-300">{vendor.id}</span>
-                                </span>
-                            )}
                             <Link href="/" className="p-2 rounded-full text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all">
                                 <LogOut className="w-5 h-5" />
                             </Link>
@@ -80,16 +80,6 @@ const VendorDashboard = () => {
                         Vendor Dashboard
                     </motion.h1>
                     <p className="text-gray-400 mt-2">Manage your store, transactions, and orders in one place</p>
-                    {vendor && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="mt-3 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-xs font-mono text-gray-400 inline-block"
-                        >
-                            ID: <span className="text-gray-300">{vendor.id}</span>
-                        </motion.div>
-                    )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -135,7 +125,36 @@ const VendorDashboard = () => {
 
                     <div className="lg:col-span-1">
                         <div className="sticky top-8">
-                            {vendor && <VendorProfile vendor={vendor} />}
+                            {loading ? (
+                                <div className="glass-card rounded-2xl p-6 h-[400px] animate-pulse">
+                                    <div className="h-14 w-14 bg-white/10 rounded-xl mb-6"></div>
+                                    <div className="h-6 w-32 bg-white/10 rounded mb-4"></div>
+                                    <div className="space-y-3">
+                                        <div className="h-20 bg-white/5 rounded-xl"></div>
+                                        <div className="h-20 bg-white/5 rounded-xl"></div>
+                                    </div>
+                                </div>
+                            ) : error ? (
+                                <div className="glass-card rounded-2xl p-6 h-full border-red-500/20 bg-red-500/5">
+                                    <div className="flex items-center gap-2 text-red-400 mb-2">
+                                        <LogOut className="w-5 h-5 rotate-180" />
+                                        <h3 className="font-bold">Unable to load profile</h3>
+                                    </div>
+                                    <p className="text-sm text-red-200/70 mb-4">{error}</p>
+                                    <button
+                                        onClick={() => window.location.reload()}
+                                        className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm transition-colors"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
+                            ) : vendor ? (
+                                <VendorProfile vendor={vendor} />
+                            ) : (
+                                <div className="glass-card rounded-2xl p-6 h-full text-center flex flex-col items-center justify-center text-gray-400">
+                                    <p>No vendor profile data found.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
