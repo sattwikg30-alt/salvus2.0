@@ -47,17 +47,17 @@ export default function Navbar() {
             <a
               href="#campaigns"
               onClick={(e) => handleScrollTo(e, 'campaigns')}
-              className="text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer"
+              className="inline-flex items-center px-4 py-2 rounded-full glass-panel backdrop-blur-md bg-black/30 border border-white/15 text-sm font-medium text-white/90 hover:text-white hover:bg-accent/10 hover:border-accent/30 transition-all hover:shadow-[0_6px_24px_rgba(80,200,255,0.2)] hover:scale-[1.01] cursor-pointer"
             >
               Campaigns
             </a>
-            <Link href="/transparency" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+            <Link href="/transparency" className="inline-flex items-center px-4 py-2 rounded-full glass-panel backdrop-blur-md bg-black/30 border border-white/15 text-sm font-medium text-white/90 hover:text-white hover:bg-accent/10 hover:border-accent/30 transition-all hover:shadow-[0_6px_24px_rgba(80,200,255,0.2)] hover:scale-[1.01]">
               Transparency
             </Link>
-            <Link href="/campaign/start" className="text-sm font-medium text-white hover:text-accent transition-colors">
+            <Link href="/campaign/start" className="inline-flex items-center px-4 py-2 rounded-full glass-panel backdrop-blur-md bg-black/30 border border-white/15 text-sm font-medium text-white hover:text-accent hover:bg-accent/10 hover:border-accent/30 transition-all hover:shadow-[0_6px_24px_rgba(80,200,255,0.2)] hover:scale-[1.01]">
               Start a Relief Campaign
             </Link>
-            <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+            <Link href="/login" className="inline-flex items-center px-4 py-2 rounded-full glass-panel backdrop-blur-md bg-black/30 border border-white/15 text-sm font-medium text-white/90 hover:text-white hover:bg-accent/10 hover:border-accent/30 transition-all hover:shadow-[0_6px_24px_rgba(80,200,255,0.2)] hover:scale-[1.01]">
               Log in
             </Link>
             <Link

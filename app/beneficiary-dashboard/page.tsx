@@ -162,13 +162,26 @@ export default function BeneficiaryDashboard() {
             </div>
           </Link>
 
-          {/* Right Actions */}
+          {/* Right Actions (leftmost to rightmost): Purchase, Notifications, Divider, Beneficiary, Logout */}
           <div className="flex items-center gap-4">
+            {/* Purchase CTA (leftmost) */}
+            <Link
+              href="#purchase-section"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel backdrop-blur-md bg-white/5 border border-white/10 text-sm font-semibold text-gray-200 hover:text-white hover:bg-accent/10 hover:border-accent/30 hover:shadow-[0_8px_30px_rgba(80,200,255,0.2)] transition-all"
+            >
+              Purchase
+            </Link>
+
+            {/* Notifications */}
             <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group">
               <Bell className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             </button>
 
+            {/* Divider */}
+            <div className="h-6 w-px bg-white/10 mx-1"></div>
+
+            {/* Beneficiary Profile */}
             <button className="flex items-center gap-2 p-1.5 rounded-full hover:bg-white/5 transition-all group">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-blue-500 flex items-center justify-center text-dark-darker font-bold text-sm shadow-lg shadow-accent/20">
                 {beneficiaryInitials}
@@ -176,6 +189,7 @@ export default function BeneficiaryDashboard() {
               <span className="text-sm font-medium text-gray-300 group-hover:text-white hidden sm:block">{beneficiaryName || 'Beneficiary'}</span>
             </button>
 
+            {/* Logout (rightmost) */}
             <Link href="/" className="p-2 rounded-full text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all">
               <LogOut className="w-5 h-5" />
             </Link>
@@ -279,13 +293,13 @@ export default function BeneficiaryDashboard() {
                   <div className="text-sm text-gray-400">(not additive, per category caps)</div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {balances.length > 0 ? balances.map(b => {
                     const spent = Math.max(0, (b.limit || 0) - (b.remaining || 0))
                     return (
-                      <div key={b.label} className="grid grid-cols-2 max-w-sm items-center py-1">
-                        <span className="text-gray-300 font-medium capitalize">{b.label}</span>
-                        <span className="text-right font-mono text-gray-200">
+                      <div key={b.label} className="glass-card rounded-xl p-4 border border-white/10 flex items-center justify-between">
+                        <span className="text-gray-300 font-bold capitalize">{b.label}</span>
+                        <span className="font-mono text-gray-200">
                           <span className="text-gray-500">₹{spent.toLocaleString()}</span>
                           <span className="mx-2 text-gray-600">/</span>
                           <span>₹{b.limit.toLocaleString()}</span>
@@ -314,6 +328,7 @@ export default function BeneficiaryDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="lg:col-span-2 glass-card rounded-3xl p-8"
+            id="purchase-section"
           >
             <div className="flex items-center gap-3 mb-8">
               <div className="p-3 rounded-full bg-accent/10 border border-accent/20 text-accent">
@@ -444,33 +459,36 @@ export default function BeneficiaryDashboard() {
                 </div>
               )}
 
-              {/* Amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Amount to Pay</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</span>
-                  <input
-                    type="text"
-                    readOnly
-                    value={amount}
-                    className="w-full pl-10 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all placeholder-gray-600 cursor-not-allowed opacity-80"
-                    placeholder="0.00"
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
-                    Calculated automatically
+              {/* Amount + Confirm (side-by-side on desktop) */}
+              <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Amount to Pay</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</span>
+                    <input
+                      type="text"
+                      readOnly
+                      value={amount}
+                      className="w-full pl-10 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all placeholder-gray-600 cursor-not-allowed opacity-80"
+                      placeholder="0.00"
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
+                      Calculated automatically
+                    </div>
                   </div>
                 </div>
+                <div>
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    disabled={loading || parseFloat(amount) <= 0 || !store}
+                    type="submit"
+                    className="w-full py-4 bg-accent hover:bg-accent-dark text-dark-darker font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                  >
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                    <span>Confirm Purchase</span>
+                  </motion.button>
+                </div>
               </div>
-
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                disabled={loading || parseFloat(amount) <= 0 || !store}
-                type="submit"
-                className="w-full py-4 bg-accent hover:bg-accent-dark text-dark-darker font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-              >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
-                <span>Confirm Purchase</span>
-              </motion.button>
 
               {message && (
                 <motion.div

@@ -61,8 +61,12 @@ export default function HeadquartersDashboard() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-end justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Overview</h1>
-                    <p className="text-slate-400 mt-2">Realtime campaign requests from the network.</p>
+                    <h1 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
+                        Headquarters <span className="text-accent">Dashboard</span>
+                    </h1>
+                    <p className="text-gray-400 text-lg max-w-2xl">
+                        Realtime campaign requests from the network.
+                    </p>
                 </div>
                 <div className="text-sm font-mono text-accent/80 bg-accent/5 px-3 py-1 rounded border border-accent/10">
                     SYSTEM STATUS: ONLINE

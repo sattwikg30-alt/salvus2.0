@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2000" height="1000" viewBox="0 0 2000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glowTeal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowGold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.8"/>
+    </filter>
+  </defs>
+
+  <!-- Transparent background for blending -->
+  <rect x="0" y="0" width="2000" height="1000" fill="transparent"/>
+
+  <!-- Monochrome landmasses (abstract, no borders/labels) -->
+  <g fill="#9AA3B2" fill-opacity="0.15" filter="url(#softBlur)">
+    <!-- North America / Greenland -->
+    <path d="M190 260 C 400 140, 720 160, 820 280 C 910 380, 860 480, 720 520 C 540 560, 360 520, 280 430 C 220 370, 160 320, 190 260 Z"/>
+    <path d="M900 120 C 980 80, 1060 120, 1080 160 C 1100 200, 980 220, 950 180 C 930 160, 890 140, 900 120 Z"/>
+    <!-- South America -->
+    <path d="M820 560 C 900 540, 980 580, 1000 640 C 1020 700, 960 780, 900 860 C 860 900, 800 900, 780 860 C 760 820, 780 740, 780 700 C 780 640, 770 580, 820 560 Z"/>
+    <!-- Europe / North Africa -->
+    <path d="M980 260 C 1080 220, 1260 220, 1340 260 C 1400 300, 1380 360, 1300 380 C 1220 400, 1100 400, 1040 360 C 990 330, 930 300, 980 260 Z"/>
+    <path d="M1120 420 C 1180 400, 1260 420, 1280 460 C 1300 500, 1240 540, 1160 560 C 1100 580, 1000 560, 990 520 C 980 480, 1060 440, 1120 420 Z"/>
+    <!-- Middle East / India -->
+    <path d="M1320 420 C 1400 400, 1520 420, 1560 460 C 1600 500, 1540 560, 1460 580 C 1380 600, 1260 580, 1240 540 C 1220 500, 1260 440, 1320 420 Z"/>
+    <!-- East Asia -->
+    <path d="M1500 300 C 1600 260, 1760 280, 1820 340 C 1860 380, 1820 440, 1740 460 C 1660 480, 1540 460, 1500 420 C 1480 380, 1460 320, 1500 300 Z"/>
+    <!-- Australia -->
+    <path d="M1580 760 C 1660 740, 1760 760, 1800 800 C 1840 840, 1780 880, 1680 880 C 1600 880, 1540 840, 1560 800 C 1568 784, 1562 768, 1580 760 Z"/>
+  </g>
+
+  <!-- Soft city light clusters (teal and gold), very low opacity for atmosphere -->
+  <g opacity="0.35" filter="url(#softBlur)">
+    <!-- Teal glows -->
+    <circle cx="640" cy="360" r="70" fill="url(#glowTeal)"/>
+    <circle cx="760" cy="520" r="60" fill="url(#glowTeal)"/>
+    <circle cx="1120" cy="340" r="65" fill="url(#glowTeal)"/>
+    <circle cx="1460" cy="480" r="60" fill="url(#glowTeal)"/>
+    <circle cx="1700" cy="380" r="55" fill="url(#glowTeal)"/>
+    <circle cx="1680" cy="820" r="45" fill="url(#glowTeal)"/>
+    <!-- Gold glows -->
+    <circle cx="1020" cy="460" r="55" fill="url(#glowGold)"/>
+    <circle cx="1280" cy="520" r="50" fill="url(#glowGold)"/>
+    <circle cx="900" cy="780" r="50" fill="url(#glowGold)"/>
+    <circle cx="720" cy="460" r="45" fill="url(#glowGold)"/>
+  </g>
+
+  <!-- Very subtle random specks for texture -->
+  <g fill="#E5E7EB" fill-opacity="0.05">
+    <circle cx="620" cy="420" r="2"/>
+    <circle cx="1180" cy="360" r="2"/>
+    <circle cx="980" cy="520" r="2"/>
+    <circle cx="1500" cy="520" r="2"/>
+    <circle cx="1720" cy="400" r="2"/>
+    <circle cx="860" cy="820" r="2"/>
+  </g>
+</svg>

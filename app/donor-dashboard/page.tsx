@@ -63,6 +63,12 @@ export default function DonorDashboard() {
             {/* Wallet Connect */}
             <WalletConnect apiEndpoint="/api/link-wallet" />
 
+            {/* Tax Reports */}
+            <button className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-accent hover:bg-accent/10 border border-transparent hover:border-accent/20 transition-all">
+              <FileText className="w-4 h-4" />
+              <span>Tax Report</span>
+            </button>
+
             {/* Notifications */}
             <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-all relative group">
               <Bell className="w-5 h-5" />
@@ -70,12 +76,6 @@ export default function DonorDashboard() {
               <div className="absolute top-full right-0 mt-2 w-48 p-2 rounded-xl glass-card text-xs text-gray-400 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                 2 updates on your campaigns
               </div>
-            </button>
-
-            {/* Tax Reports */}
-            <button className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-accent hover:bg-accent/10 border border-transparent hover:border-accent/20 transition-all">
-              <FileText className="w-4 h-4" />
-              <span>Tax Report</span>
             </button>
 
             <div className="h-6 w-px bg-white/10 mx-1"></div>

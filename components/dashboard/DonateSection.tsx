@@ -8,7 +8,6 @@ import { ArrowRight, X, CheckCircle, MapPin, Users, TrendingUp } from 'lucide-re
 export default function DonateSection() {
   const [selectedCampaign, setSelectedCampaign] = useState('')
   const [amount, setAmount] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('UPI')
   const [showModal, setShowModal] = useState(false)
   const [donationDetails, setDonationDetails] = useState<any>(null)
   const [mounted, setMounted] = useState(false)
@@ -78,7 +77,6 @@ export default function DonateSection() {
       campaign: campaign?.name || selectedCampaign,
       timestamp,
       referenceId: refId,
-      paymentMethod,
     })
     setShowModal(true)
   }
@@ -87,7 +85,6 @@ export default function DonateSection() {
     setShowModal(false)
     setSelectedCampaign('')
     setAmount('')
-    setPaymentMethod('UPI')
     setDonationDetails(null)
   }
 
@@ -180,8 +177,8 @@ export default function DonateSection() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Amount Input */}
+            {/* Amount + Confirm side by side on desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Donation Amount
@@ -202,48 +199,21 @@ export default function DonateSection() {
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Payment Method
-                </label>
-                <div className="grid grid-cols-2 gap-3 h-[60px]"> {/* Fixed height for alignment */}
-                  <motion.button
-                    type="button"
-                    onClick={() => setPaymentMethod('UPI')}
-                    whileTap={{ scale: 0.98 }}
-                    className={`relative h-full rounded-xl border transition-all duration-300 flex items-center justify-center font-bold text-sm ${paymentMethod === 'UPI'
-                      ? 'bg-white text-dark-darker border-white'
-                      : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                      }`}
-                  >
-                    UPI / QR
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    onClick={() => setPaymentMethod('Card')}
-                    whileTap={{ scale: 0.98 }}
-                    className={`relative h-full rounded-xl border transition-all duration-300 flex items-center justify-center font-bold text-sm ${paymentMethod === 'Card'
-                      ? 'bg-white text-dark-darker border-white'
-                      : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                      }`}
-                  >
-                    Card
-                  </motion.button>
-                </div>
-              </div>
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.98 }}
+                disabled={!selectedCampaign || !amount}
+                className="w-full md:w-auto px-6 py-4 bg-accent hover:bg-accent-dark text-dark-darker font-bold text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                <span>Confirm Donation</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
             </div>
 
-            {/* Donate Now Button */}
-            <motion.button
-              type="submit"
-              whileTap={{ scale: 0.98 }}
-              disabled={!selectedCampaign || !amount}
-              className="w-full py-4 bg-accent hover:bg-accent-dark text-dark-darker font-bold text-lg rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-            >
-              <span>Confirm Donation</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            {/* Status strip */}
+            <div className="mt-3 text-[11px] sm:text-xs text-gray-400/90 text-center whitespace-nowrap">
+              Vendor-only payouts <span className="mx-2">•</span> Category limits enforced <span className="mx-2">•</span> Public audit trail
+            </div>
           </form>
         </div>
       </motion.div>
@@ -297,11 +267,7 @@ export default function DonateSection() {
                     <span className="text-white font-semibold text-right max-w-[60%]">{donationDetails.campaign}</span>
                   </div>
                   <div className="h-px bg-dark-lighter/50"></div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-400">Payment Method</span>
-                    <span className="text-white font-semibold">{donationDetails.paymentMethod}</span>
-                  </div>
-                  <div className="h-px bg-dark-lighter/50"></div>
+                  
                   <div className="flex justify-between items-start py-2">
                     <span className="text-gray-400">Timestamp</span>
                     <span className="text-white font-semibold text-sm text-right max-w-[60%]">{donationDetails.timestamp}</span>

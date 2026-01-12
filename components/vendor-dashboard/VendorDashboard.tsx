@@ -77,7 +77,7 @@ const VendorDashboard = () => {
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-5xl font-black text-white tracking-tight"
                     >
-                        Vendor Dashboard
+                        Vendor <span className="text-accent">Dashboard</span>
                     </motion.h1>
                     <p className="text-gray-400 mt-2">Manage your store, transactions, and orders in one place</p>
                 </div>
