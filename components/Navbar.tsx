@@ -38,7 +38,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="relative z-50 group">
             <span className="text-2xl font-bold tracking-tighter text-white">
-              SALVUS<span className="text-accent">.</span>
+              $ALVUS<span className="text-accent">.</span>
             </span>
           </Link>
 
